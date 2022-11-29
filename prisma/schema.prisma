@@ -1,0 +1,72 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model User {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  email     String    @unique
+  name      String?
+  phone     String
+  product   Product[]
+  isLent    UserLent[]
+}
+
+model Product {
+  id                Int          @id @default(autoincrement())
+  createdAt         DateTime     @default(now())
+  author            User?        @relation(fields: [authorId], references: [id])
+  authorId          Int
+  productName       String
+  productDetail     String
+  productCost       Int
+  productUrl        String
+  productImage      String
+  isFavorite        Boolean
+  isLent            UserLent[]
+  categories        CategoriesOnProduct[]
+}
+
+model CategoriesOnProduct {
+  product     Product     @relation(fields: [productId], references: [id])
+  productId   Int
+  category    Categories  @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  assignedBy  String
+
+  @@id([productId, categoryId])
+}
+
+model Categories {
+  id                Int                 @id @default(autoincrement())
+  name              Category
+  products          CategoriesOnProduct[]
+}
+
+enum Category {
+  Kitchen
+  Furniture
+  Electronic
+  Fashion
+  Household
+  Tool
+  Game
+  Sport
+  Jewelry
+  Art
+  Pet
+}
+
+model UserLent {
+  id  Int  @id @default(autoincrement())
+  user User? @relation(fields: [userId], references: [id])
+  userId Int
+  product Product? @relation(fields: [productId], references: [id])
+  productId Int
+}
