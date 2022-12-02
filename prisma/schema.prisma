@@ -37,8 +37,8 @@ model CategoriesOnProduct {
   product     Product     @relation(fields: [productId], references: [id])
   productId   Int
   category    Categories  @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  assignedBy  String
+  categoryId Int
+  assignedBy  Int
 
   @@id([productId, categoryId])
 }
