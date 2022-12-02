@@ -117,7 +117,6 @@ app.put("/reviews/update/:reviewId", async (req, res) => {
     `reviewId has updated to ${updateReviewId}`
   );
 })
-
 app.post("/products/create", async (req, res) => {
   const {
     productName,
@@ -170,7 +169,6 @@ app.post("/products/create", async (req, res) => {
     `Product ${productName} with id ${createProduct.id} has created. categories: ${categories}.`
   );
 });
-
 const server = app.listen(3000, () =>
   console.log(`
 🚀 Server ready at: http://localhost:3000`)
