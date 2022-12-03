@@ -37,10 +37,13 @@ app.get("/reviews/:productId/count", async (req, res) => {
 //Favorites
 app.get("/products/:userId/favorites", async (req, res) => {
   const { userId } = req.params;
-  const products = await prisma.favorite.findMany({
+  const favorite = await prisma.favorite.findMany({
     where: { userId: Number(userId) },
   });
-  res.json(products);
+  // const products = await prisma.product.findMany({
+  //   where: { id: Number() },
+  // });
+  res.json(favorite);
 });
 
 //comments CRUD
