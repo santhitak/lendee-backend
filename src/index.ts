@@ -26,6 +26,12 @@ app.get("/users", async (req, res) => {
   res.json(users);
 });
 
+//read img
+app.get("/productImages", async (req, res) => {
+  const users = await prisma.productImage.findMany();
+  res.json(users);
+});
+
 //count comments
 app.get("/comments/:productId/count", async (req, res) => {
   const { productId } = req.params;
