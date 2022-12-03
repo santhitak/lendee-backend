@@ -18,6 +18,7 @@ model User {
   isLent    UserLent[]
   comment   Comment[]
   review    Review[]
+  favorite Favorite[]
   
 }
 
@@ -31,12 +32,14 @@ model Product {
   productCost       Int
   productQuantity   Int
   productUrl        String
-  productImage      String
+  productImage      ProductImage[]
   isFavorite        Boolean
   isLent            UserLent[]
   categories        CategoriesOnProduct[]
   comment           Comment[]
   review            Review[]
+  favorite          Favorite[]
+  
 }
 
 model CategoriesOnProduct {
@@ -95,3 +98,20 @@ model Review {
   product Product? @relation(fields: [productId], references: [id])
   productId Int
 }
+
+model ProductImage {
+  id  Int  @id @default(autoincrement())
+  img String
+  product Product? @relation(fields: [productId], references: [id])
+  productId Int
+}
+
+model Favorite {
+  id  Int  @id @default(autoincrement())
+  product Product? @relation(fields: [productId], references: [id])
+  productId Int
+   user User? @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+

@@ -16,6 +16,33 @@ app.get("/users", async (req, res) => {
   res.json(users);
 });
 
+//count comments
+app.get("/comments/:productId/count", async (req, res) => {
+  const { productId } = req.params;
+  const commentCount = await prisma.comment.count({
+    where: { productId: Number(productId) },
+  });
+  res.json(commentCount);
+});
+
+//count reviews
+app.get("/reviews/:productId/count", async (req, res) => {
+  const { productId } = req.params;
+  const reviewCount = await prisma.review.count({
+    where: { productId: Number(productId) },
+  });
+  res.json(reviewCount);
+});
+
+//Favorites
+app.get("/products/:userId/favorites", async (req, res) => {
+  const { userId } = req.params;
+  const products = await prisma.favorite.findMany({
+    where: { userId: Number(userId) },
+  });
+  res.json(products);
+});
+
 //comments CRUD
 app.post("/comments/create", async (req, res) => {
   const { userId, detail, productId } = req.body;
@@ -41,7 +68,7 @@ app.get("/comments/:productId", async (req, res) => {
   const { productId } = req.params;
   const commentsById = await prisma.comment.findMany({
     where: {
-      id: Number(productId),
+      productId: Number(productId),
     },
   });
   res.json(commentsById);
@@ -58,9 +85,8 @@ app.put("/comments/update/:commentId", async (req, res) => {
       detail: detail,
     },
   });
-  res.json(`comments has updated to ${updateComments.detail}`);
+  res.json(`comments has updated to ${updateComments}`);
 });
-
 app.delete("/comments/delete/:commentId", async (req, res) => {
   const { commentId } = req.params;
   const deleteCommentsById = await prisma.comment.delete({
@@ -122,8 +148,6 @@ app.put("/reviews/update/:reviewId", async (req, res) => {
   });
   res.json(`reviewId has updated to ${updateReviewId}`);
 });
-
-const assignCategories = (product: any, cat: any, authorId: any) => {};
 
 app.post("/products/create", async (req, res) => {
   const {
