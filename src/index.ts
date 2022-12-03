@@ -1,7 +1,5 @@
-import { Category, Prisma, PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 import express from "express";
-import { connect } from "http2";
-import { User } from "./type";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -33,6 +31,12 @@ app.post("/comments/create", async (req, res) => {
     `comments ${detail} with id ${comments.id} has created by User ${userId} in Product ${productId}.`
   );
 });
+
+app.get("/comments", async (req, res) => {
+  const comments = await prisma.comment.findMany();
+  res.json(comments);
+});
+
 app.get("/comments/:productId", async (req, res) => {
   const { productId } = req.params;
   const commentsById = await prisma.comment.findMany({
@@ -42,21 +46,21 @@ app.get("/comments/:productId", async (req, res) => {
   });
   res.json(commentsById);
 });
+
 app.put("/comments/update/:commentId", async (req, res) => {
   const { commentId } = req.params;
-  const {detail} = req.body;
+  const { detail } = req.body;
   const updateComments = await prisma.comment.update({
-    where:{
+    where: {
       id: Number(commentId),
     },
     data: {
       detail: detail,
-    }
-  })
-  res.json(
-    `comments has updated to ${updateComments}`
-  );
-})
+    },
+  });
+  res.json(`comments has updated to ${updateComments.detail}`);
+});
+
 app.delete("/comments/delete/:commentId", async (req, res) => {
   const { commentId } = req.params;
   const deleteCommentsById = await prisma.comment.delete({
@@ -84,6 +88,7 @@ app.post("/reviews/create", async (req, res) => {
     `reviews ${detail} with id ${reviews.id} has created by User ${userId} in Product ${productId}.`
   );
 });
+
 app.get("/reviews/:productId", async (req, res) => {
   const { productId } = req.params;
   const reviewsById = await prisma.review.findMany({
@@ -93,6 +98,7 @@ app.get("/reviews/:productId", async (req, res) => {
   });
   res.json(reviewsById);
 });
+
 app.delete("/reviews/delete/:reviewId", async (req, res) => {
   const { reviewId } = req.params;
   const deleteReviewsById = await prisma.review.delete({
@@ -102,21 +108,21 @@ app.delete("/reviews/delete/:reviewId", async (req, res) => {
   });
   res.json(`reviews ${deleteReviewsById.id} has deleted`);
 });
+
 app.put("/reviews/update/:reviewId", async (req, res) => {
   const { reviewId } = req.params;
-  const {detail} = req.body;
+  const { detail } = req.body;
   const updateReviewId = await prisma.review.update({
-    where:{
+    where: {
       id: Number(reviewId),
     },
     data: {
       detail: detail,
-    }
-  })
-  res.json(
-    `reviewId has updated to ${updateReviewId}`
-  );
-})
+    },
+  });
+  res.json(`reviewId has updated to ${updateReviewId}`);
+});
+
 app.post("/products/create", async (req, res) => {
   const {
     productName,
@@ -169,6 +175,7 @@ app.post("/products/create", async (req, res) => {
     `Product ${productName} with id ${createProduct.id} has created. categories: ${categories}.`
   );
 });
+
 const server = app.listen(3000, () =>
   console.log(`
 🚀 Server ready at: http://localhost:3000`)
