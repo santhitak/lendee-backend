@@ -21,6 +21,20 @@ app.get("/productImages/:productId", async (req, res) => {
   res.json(images);
 });
 
+app.get("/products/:id", async (req, res) => {
+  const { id } = req.params;
+  const products = await prisma.user.findUnique({
+    where: {
+      id: Number(id),
+    },
+    include: {
+      product: true,
+    },
+  });
+
+  res.json(products);
+});
+
 app.get("/users", async (req, res) => {
   const users = await prisma.user.findMany();
   res.json(users);

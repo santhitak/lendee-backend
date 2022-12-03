@@ -14,6 +14,7 @@ model User {
   email     String     @unique
   name      String?
   phone     String
+  product   Product[]
   comment   Comment[]
   favorite  Favorite[]
   review    Review[]
@@ -36,6 +37,7 @@ model Product {
   productImage    ProductImage[]
   review          Review[]
   isLent          UserLent[]
+  author          User?                @relation(fields: [authorId], references: [id])
 }
 
 model CategoriesOnProduct {
