@@ -11,6 +11,16 @@ app.get("/products", async (req, res) => {
   res.json(products);
 });
 
+app.get("/productImages/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const images = await prisma.productImage.findMany({
+    where: {
+      productId: Number(productId),
+    },
+  });
+  res.json(images);
+});
+
 app.get("/users", async (req, res) => {
   const users = await prisma.user.findMany();
   res.json(users);
@@ -122,8 +132,6 @@ app.put("/reviews/update/:reviewId", async (req, res) => {
   });
   res.json(`reviewId has updated to ${updateReviewId}`);
 });
-
-const assignCategories = (product: any, cat: any, authorId: any) => {};
 
 app.post("/products/create", async (req, res) => {
   const {
