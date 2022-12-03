@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import express from "express";
 
 const prisma = new PrismaClient();
@@ -123,6 +123,8 @@ app.put("/reviews/update/:reviewId", async (req, res) => {
   res.json(`reviewId has updated to ${updateReviewId}`);
 });
 
+const assignCategories = (product: any, cat: any, authorId: any) => {};
+
 app.post("/products/create", async (req, res) => {
   const {
     productName,
@@ -135,14 +137,6 @@ app.post("/products/create", async (req, res) => {
     categories,
   } = req.body;
 
-  const categoriesData = categories?.map(
-    (product: Prisma.ProductCreateInput) => {
-      return {
-        categoryId: product?.categories,
-      };
-    }
-  );
-
   const createProduct = await prisma.product.create({
     data: {
       productName,
@@ -152,7 +146,12 @@ app.post("/products/create", async (req, res) => {
       productImage,
       productUrl,
       authorId,
-      categories: categoriesData,
+      categories: {
+        create: {
+          categoryId: categories,
+          assignedBy: authorId,
+        },
+      },
       isFavorite: false,
     },
     include: {
@@ -160,14 +159,11 @@ app.post("/products/create", async (req, res) => {
     },
   });
 
-  const assignCategories = await prisma.categoriesOnProduct.create({
+  const assignCategories = prisma.categoriesOnProduct.create({
     data: {
-      product: productName,
-      category: categories,
+      productId: Number(createProduct.id),
+      categoryId: categories,
       assignedBy: authorId,
-    },
-    include: {
-      product: true,
     },
   });
 
