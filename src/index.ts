@@ -176,7 +176,6 @@ app.get("/comments/:productId", async (req, res) => {
   });
   res.json(commentsById);
 });
-
 app.put("/comments/update/:commentId", async (req, res) => {
   const { commentId } = req.params;
   const { detail } = req.body;
@@ -348,6 +347,41 @@ app.get("/categories/:productId", async (req, res) => {
     },
   });
   res.json(getItems);
+});
+
+//CRD my lends
+app.post("/lend/create/:userId/:productId", async (req, res) => {
+  const { userId, productId } = req.params;
+  //ต้องเช็คด้วยวว่า เป็น 1 ในคนที่เคยยืมของชิ้นนี้หรือเปล่า
+
+  const reviews = await prisma.userLent.create({
+    data: {
+      userId: Number(userId),
+      productId: Number(productId),
+    },
+  });
+  res.json(`lend has recorded`);
+});
+app.get("/lend/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const reviewsById = await prisma.userLent.findMany({
+    where: {
+      userId: Number(userId),
+    },
+  });
+
+  res.json(reviewsById);
+});
+app.delete("/lend/delete/:userId/:productId", async (req, res) => {
+  const { productId, userId } = req.params;
+  const removeFavorite = await prisma.userLent.deleteMany({
+    where: {
+      productId: Number(productId),
+      userId: Number(userId),
+    },
+  });
+
+  res.json(`lend has removed`);
 });
 
 const server = app.listen(3000, () =>
