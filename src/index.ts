@@ -310,6 +310,26 @@ app.delete("/favorites/:id/:productId", async (req, res) => {
   res.json(`favorite product id ${removeFavorite.productId} has removed`);
 });
 
+app.get("/lends/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const getItems = await prisma.userLent.findMany({
+    where: {
+      userId: Number(userId),
+    },
+  });
+  res.json(getItems);
+});
+
+app.get("/categories/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const getItems = await prisma.categoriesOnProduct.findMany({
+    where: {
+      productId: Number(productId),
+    },
+  });
+  res.json(getItems);
+});
+
 const server = app.listen(3000, () =>
   console.log(`
 🚀 Server ready at: http://localhost:3000`)
