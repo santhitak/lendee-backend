@@ -269,6 +269,43 @@ app.get("/favorites/:userId", async (req, res) => {
   res.json(getFavoriteById);
 });
 
+app.put("/favorites/onFav/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const updateProduct = await prisma.product.update({
+    where: {
+      id: Number(productId),
+    },
+    data: {
+      isFavorite: true,
+    },
+  });
+  const updateFavorite = await prisma.favorite.create({
+    data: {
+      productId: Number(productId),
+      userId: 1,
+    },
+  });
+  res.json(`favorites has updated`);
+});
+app.delete("/favorites/offFav/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const removeFavorite = await prisma.favorite.deleteMany({
+    where: {
+      productId: Number(productId),
+      userId: 1,
+    },
+  });
+  const updateIsFavorite = await prisma.product.update({
+    where: {
+      id: Number(productId),
+    },
+    data: {
+      isFavorite: false,
+    },
+  });
+  res.json(`favorite product has removed`);
+});
+
 app.post("/favorites/:productId", async (req, res) => {
   const { productId } = req.params;
   const updateisFavorite = await prisma.favorite.create({
@@ -288,26 +325,6 @@ app.post("/favorites/:productId", async (req, res) => {
   });
 
   res.json(updateisFavorite);
-});
-
-app.delete("/favorites/:id/:productId", async (req, res) => {
-  const { id, productId } = req.params;
-  const removeFavorite = await prisma.favorite.delete({
-    where: {
-      id: Number(id),
-    },
-  });
-
-  const updateIsFavorite = await prisma.product.update({
-    where: {
-      id: Number(productId),
-    },
-    data: {
-      isFavorite: false,
-    },
-  });
-
-  res.json(`favorite product id ${removeFavorite.productId} has removed`);
 });
 
 const server = app.listen(3000, () =>
