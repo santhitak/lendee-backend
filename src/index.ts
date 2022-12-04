@@ -114,8 +114,8 @@ app.get("/users", async (req, res) => {
 
 //read img
 app.get("/productImages", async (req, res) => {
-  const users = await prisma.productImage.findMany();
-  res.json(users);
+  const images = await prisma.productImage.findMany();
+  res.json(images);
 });
 
 //count comments
@@ -362,16 +362,18 @@ app.post("/lend/create/:userId/:productId", async (req, res) => {
   });
   res.json(`lend has recorded`);
 });
+
 app.get("/lend/:userId", async (req, res) => {
   const { userId } = req.params;
-  const reviewsById = await prisma.userLent.findMany({
+  const lendById = await prisma.userLent.findMany({
     where: {
       userId: Number(userId),
     },
   });
 
-  res.json(reviewsById);
+  res.json(lendById);
 });
+
 app.delete("/lend/delete/:userId/:productId", async (req, res) => {
   const { productId, userId } = req.params;
   const removeFavorite = await prisma.userLent.deleteMany({
@@ -382,6 +384,11 @@ app.delete("/lend/delete/:userId/:productId", async (req, res) => {
   });
 
   res.json(`lend has removed`);
+});
+
+app.get("/getCategories", async (req, res) => {
+  const getItems = await prisma.categoriesOnProduct.findMany();
+  res.json(getItems);
 });
 
 const server = app.listen(3000, () =>
