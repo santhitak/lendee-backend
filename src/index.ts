@@ -176,6 +176,7 @@ app.get("/comments/:productId", async (req, res) => {
   });
   res.json(commentsById);
 });
+
 app.put("/comments/update/:commentId", async (req, res) => {
   const { commentId } = req.params;
   const { detail } = req.body;
@@ -189,6 +190,7 @@ app.put("/comments/update/:commentId", async (req, res) => {
   });
   res.json(`comments has updated to ${updateComments.detail}}`);
 });
+
 app.delete("/comments/delete/:commentId", async (req, res) => {
   const { commentId } = req.params;
   const deleteCommentsById = await prisma.comment.delete({
@@ -270,7 +272,7 @@ app.post("/favorites/:productId", async (req, res) => {
     },
   });
 
-  res.json(`modify favorite product id ${updateisFavorite.productId}`);
+  res.json(updateisFavorite);
 });
 
 app.delete("/favorites/:id/:productId", async (req, res) => {
