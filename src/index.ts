@@ -259,6 +259,16 @@ app.put("/reviews/update/:reviewId", async (req, res) => {
 });
 
 //add isFavorite
+app.get("/favorites/:userId", async (req, res) => {
+  const { userId } = req.params;
+  const getFavoriteById = await prisma.favorite.findMany({
+    where: {
+      userId: Number(userId),
+    },
+  });
+  res.json(getFavoriteById);
+});
+
 app.post("/favorites/:productId", async (req, res) => {
   const { productId } = req.params;
   const updateisFavorite = await prisma.favorite.create({
