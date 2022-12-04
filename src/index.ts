@@ -6,21 +6,55 @@ const app = express();
 
 app.use(express.json());
 
+//CRUD products
+app.post("/products/create", async (req, res) => {
+  const {
+    authorId,
+    productName,
+    productDetail,
+    productCost,
+    productQuantity,
+    productUrl,
+    categories,
+    isFavorite,
+    productImage,
+  } = req.body;
+
+  const createProduct = await prisma.product.create({
+    data: {
+      productName,
+      productDetail,
+      productCost,
+      productQuantity,
+      productUrl,
+      authorId,
+      isFavorite: false,
+    },
+  });
+
+  const assignCategories = await prisma.categoriesOnProduct.create({
+    data: {
+      productId: Number(createProduct.id),
+      categoryId: categories,
+      assignedBy: authorId,
+    },
+  });
+  for (let i = 0; i < productImage.length; i++) {
+    await prisma.productImage.create({
+      data: {
+        productId: Number(createProduct.id),
+        img: productImage[i],
+      },
+    });
+  }
+  res.json(
+    `Product ${productName} with id ${createProduct.id} has created. categories: ${categories} `
+  );
+});
 app.get("/products", async (req, res) => {
   const products = await prisma.product.findMany();
   res.json(products);
 });
-
-app.get("/productImages/:productId", async (req, res) => {
-  const { productId } = req.params;
-  const images = await prisma.productImage.findMany({
-    where: {
-      productId: Number(productId),
-    },
-  });
-  res.json(images);
-});
-
 app.get("/products/:id", async (req, res) => {
   const { id } = req.params;
   const products = await prisma.user.findUnique({
@@ -34,7 +68,45 @@ app.get("/products/:id", async (req, res) => {
 
   res.json(products);
 });
+app.put("/products/update/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const { productName, productDetail, productCost, productQuantity } = req.body;
+  const updateProducts = await prisma.product.update({
+    where: {
+      id: Number(productId),
+    },
+    data: {
+      productName,
+      productDetail,
+      productCost,
+      productQuantity,
+    },
+  });
+  res.json(`products has updated`);
+});
+app.delete("/products/delete/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const deleteProductsById = await prisma.product.delete({
+    where: {
+      id: Number(productId),
+    },
+  });
 
+  res.json(`products ${deleteProductsById.id} has deleted`);
+});
+
+//Read Product Image by Product ID
+app.get("/productImages/:productId", async (req, res) => {
+  const { productId } = req.params;
+  const images = await prisma.productImage.findMany({
+    where: {
+      productId: Number(productId),
+    },
+  });
+  res.json(images);
+});
+
+//Read All users
 app.get("/users", async (req, res) => {
   const users = await prisma.user.findMany();
   res.json(users);
@@ -91,12 +163,10 @@ app.post("/comments/create", async (req, res) => {
     `comments ${detail} with id ${comments.id} has created by User ${userId} in Product ${productId}.`
   );
 });
-
 app.get("/comments", async (req, res) => {
   const comments = await prisma.comment.findMany();
   res.json(comments);
 });
-
 app.get("/comments/:productId", async (req, res) => {
   const { productId } = req.params;
   const commentsById = await prisma.comment.findMany({
@@ -106,7 +176,6 @@ app.get("/comments/:productId", async (req, res) => {
   });
   res.json(commentsById);
 });
-
 app.put("/comments/update/:commentId", async (req, res) => {
   const { commentId } = req.params;
   const { detail } = req.body;
@@ -147,7 +216,6 @@ app.post("/reviews/create", async (req, res) => {
     `reviews ${detail} with id ${reviews.id} has created by User ${userId} in Product ${productId}.`
   );
 });
-
 app.get("/reviews/:productId", async (req, res) => {
   const { productId } = req.params;
   const reviewsById = await prisma.review.findMany({
@@ -157,7 +225,6 @@ app.get("/reviews/:productId", async (req, res) => {
   });
   res.json(reviewsById);
 });
-
 app.delete("/reviews/delete/:reviewId", async (req, res) => {
   const { reviewId } = req.params;
   const deleteReviewsById = await prisma.review.delete({
@@ -167,7 +234,6 @@ app.delete("/reviews/delete/:reviewId", async (req, res) => {
   });
   res.json(`reviews ${deleteReviewsById.id} has deleted`);
 });
-
 app.put("/reviews/update/:reviewId", async (req, res) => {
   const { reviewId } = req.params;
   const { detail } = req.body;
@@ -180,53 +246,6 @@ app.put("/reviews/update/:reviewId", async (req, res) => {
     },
   });
   res.json(`reviewId has updated to ${updateReviewId}`);
-});
-
-app.post("/products/create", async (req, res) => {
-  const {
-    productName,
-    productDetail,
-    productCost,
-    productQuantity,
-    productImage,
-    productUrl,
-    authorId,
-    categories,
-  } = req.body;
-
-  const createProduct = await prisma.product.create({
-    data: {
-      productName,
-      productDetail,
-      productCost,
-      productQuantity,
-      productImage,
-      productUrl,
-      authorId,
-      categories: {
-        create: {
-          categoryId: categories,
-          assignedBy: authorId,
-        },
-      },
-      isFavorite: false,
-    },
-    include: {
-      categories: true,
-    },
-  });
-
-  const assignCategories = prisma.categoriesOnProduct.create({
-    data: {
-      productId: Number(createProduct.id),
-      categoryId: categories,
-      assignedBy: authorId,
-    },
-  });
-
-  res.json(
-    `Product ${productName} with id ${createProduct.id} has created. categories: ${categories}.`
-  );
 });
 
 const server = app.listen(3000, () =>
