@@ -279,6 +279,7 @@ app.put("/favorites/onFav/:productId", async (req, res) => {
       isFavorite: true,
     },
   });
+
   const updateFavorite = await prisma.favorite.create({
     data: {
       productId: Number(productId),
@@ -287,6 +288,7 @@ app.put("/favorites/onFav/:productId", async (req, res) => {
   });
   res.json(`favorites has updated`);
 });
+
 app.delete("/favorites/offFav/:productId", async (req, res) => {
   const { productId } = req.params;
   const removeFavorite = await prisma.favorite.deleteMany({
@@ -295,6 +297,7 @@ app.delete("/favorites/offFav/:productId", async (req, res) => {
       userId: 1,
     },
   });
+
   const updateIsFavorite = await prisma.product.update({
     where: {
       id: Number(productId),
