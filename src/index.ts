@@ -203,14 +203,14 @@ app.delete("/comments/delete/:commentId", async (req, res) => {
 
 //reviews CRUD
 app.post("/reviews/create", async (req, res) => {
-  const { userId, detail, productId } = req.body;
+  const { userId, detail, productId, rating } = req.body;
   //ต้องเช็คด้วยวว่า เป็น 1 ในคนที่เคยยืมของชิ้นนี้หรือเปล่า
-  if (productId) {
-  }
+
   const reviews = await prisma.review.create({
     data: {
       userId,
       detail,
+      rating,
       productId,
     },
   });
@@ -226,6 +226,11 @@ app.get("/reviews/:productId", async (req, res) => {
       productId: Number(productId),
     },
   });
+  res.json(reviewsById);
+});
+
+app.get("/reviews", async (req, res) => {
+  const reviewsById = await prisma.review.findMany({});
   res.json(reviewsById);
 });
 
