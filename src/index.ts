@@ -201,16 +201,16 @@ app.delete("/comments/delete/:commentId", async (req, res) => {
 });
 
 //reviews CRUD
-app.post("/reviews/create", async (req, res) => {
-  const { userId, detail, productId, rating } = req.body;
+app.post("/reviews/create/:userId/:detail/:productId/:rating", async (req, res) => {
+  const { userId, detail, productId, rating } = req.params;
   //ต้องเช็คด้วยวว่า เป็น 1 ในคนที่เคยยืมของชิ้นนี้หรือเปล่า
 
   const reviews = await prisma.review.create({
     data: {
-      userId,
-      detail,
-      rating,
-      productId,
+      userId: Number(userId),
+      detail: detail,  
+      rating: Number(rating),
+      productId: Number(productId),
     },
   });
   res.json(
