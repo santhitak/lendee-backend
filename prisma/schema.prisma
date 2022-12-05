@@ -1,5 +1,6 @@
 generator client {
   provider = "prisma-client-js"
+  
 }
 
 datasource db {
@@ -9,44 +10,110 @@ datasource db {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
 model User {
-  id        Int       @id @default(autoincrement())
-  createdAt DateTime  @default(now())
-  email     String    @unique
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  email     String     @unique
   name      String?
   phone     String
-  product   Product[]
+  product   Product[] 
+  comment   Comment[]
+  favorite  Favorite[]
+  review    Review[]
   isLent    UserLent[]
 }
 
 model Product {
-  id                Int          @id @default(autoincrement())
-  createdAt         DateTime     @default(now())
-  author            User?        @relation(fields: [authorId], references: [id])
-  authorId          Int
-  productName       String
-  productDetail     String
-  productCost       Int
-  productUrl        String
-  productImage      String
-  isFavorite        Boolean
-  isLent            UserLent[]
-  categories        CategoriesOnProduct[]
+  id              Int                   @id @default(autoincrement())
+  createdAt       DateTime              @default(now())
+  authorId        Int
+  productName     String
+  productDetail   String
+  productCost     Int
+  productQuantity Int
+  productUrl      String
+  isFavorite      Boolean
+  categories      CategoriesOnProduct[]
+  comment         Comment[]
+  favorite        Favorite[]
+  productImage    ProductImage[]
+  review          Review[]
+  isLent          UserLent[]
+  author          User?                @relation(fields: [authorId], references: [id])
 }
 
 model CategoriesOnProduct {
-  product     Product     @relation(fields: [productId], references: [id])
-  productId   Int
-  category    Categories  @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  assignedBy  String
+  productId  Int
+  categoryId Int
+  assignedBy Int
+  category   Categories @relation(fields: [categoryId], references: [id])
+  product    Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([productId, categoryId])
+  @@index([categoryId], map: "CategoriesOnProduct_categoryId_fkey")
 }
 
 model Categories {
-  id                Int                 @id @default(autoincrement())
-  name              Category
-  products          CategoriesOnProduct[]
+  id       Int                   @id @default(autoincrement())
+  name     Category
+  products CategoriesOnProduct[]
+}
+
+model UserLent {
+  id        Int     @id @default(autoincrement())
+  userId    Int
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@index([productId], map: "UserLent_productId_fkey")
+  @@index([userId], map: "UserLent_userId_fkey")
+}
+
+model Comment {
+  id        Int     @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  userId    Int
+  detail    String
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@index([productId], map: "Comment_productId_fkey")
+  @@index([userId], map: "Comment_userId_fkey")
+}
+
+model Review {
+  id        Int     @id @default(autoincrement())
+  createdAt DateTime   @default(now())
+  userId    Int
+  detail    String
+  rating    Int
+  productId Int
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  user      User    @relation(fields: [userId], references: [id])
+
+  @@index([productId], map: "Review_productId_fkey")
+  @@index([userId], map: "Review_userId_fkey")
+}
+
+model Favorite {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  userId    Int
+  Product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  User      User    @relation(fields: [userId], references: [id])
+
+  @@index([productId], map: "Favorite_productId_fkey")
+  @@index([userId], map: "Favorite_userId_fkey")
+}
+
+model ProductImage {
+  id        Int     @id @default(autoincrement())
+  img       String
+  productId Int
+  Product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId], map: "ProductImage_productId_fkey")
 }
 
 enum Category {
@@ -61,12 +128,4 @@ enum Category {
   Jewelry
   Art
   Pet
-}
-
-model UserLent {
-  id  Int  @id @default(autoincrement())
-  user User? @relation(fields: [userId], references: [id])
-  userId Int
-  product Product? @relation(fields: [productId], references: [id])
-  productId Int
 }
