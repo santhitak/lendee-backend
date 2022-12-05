@@ -13,7 +13,7 @@ cd lendee-backend
 npm install
 ```
 
-### 3. Create .env file (.txt file in link)
+### 3. Create .env file (detail in .txt file)
 
 ### 4. Generate Prisma
 ```
