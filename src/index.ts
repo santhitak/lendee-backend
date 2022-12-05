@@ -1,10 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 import express from "express";
 
+const cors = require("cors");
 const prisma = new PrismaClient();
 const app = express();
 
 app.use(express.json());
+const corsOptions = {
+  origin: "http://localhost:19006",
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 //CRUD products
 app.post("/products/create", async (req, res) => {
